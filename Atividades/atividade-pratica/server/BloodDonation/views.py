@@ -8,7 +8,7 @@ from .serializers import BloodDonationSerializer
 
 class BloodDonationsList(APIView):
     renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'Location/blood_donations_list.html'
+    template_name = 'Donation/blood_donations_list.html'
 
     def get(self, request):
         blood_donations = BloodDonation.objects.all()
@@ -24,7 +24,7 @@ class BloodDonationsList(APIView):
 
 class BloodDonationDetails(APIView):
     renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'Location/blood_donation_details.html'
+    template_name = 'Donation/blood_donation_details.html'
 
     def get(self, request, id):
         blood_donation = get_object_or_404(BloodDonation, pk=id)
