@@ -1,48 +1,46 @@
-from django.shortcuts import render
-
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 from .models import State
 from .serializers import StateSerializer
 
+class StatesList(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'Location/states_list.html'
 
-@api_view(['GET', 'POST'])
-def list_states(request):
-    
-    if request.method == 'GET':
+    def get(self, request):
         states = State.objects.all()
         serializer = StateSerializer(states, many=True)
-        return Response(serializer.data)
-        # return render(request, 'State/list_states.html')
-        
+        return Response({"states":serializer.data})
     
-    if request.method == 'POST':
+    def post(self, request):
         serializer = StateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
 
+class StateDetails(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'Location/state_details.html'
 
-@api_view(['GET', 'PUT', 'DELETE'])
-def state_details(request, id):
-    try:
-        state = State.objects.get(pk=id)
-    except State.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    if request.method == 'GET':
+    def get(self, request, id):
+        state = get_object_or_404(State, pk=id)
         serializer = StateSerializer(state)
-        return Response(serializer.data)
+        return Response({'serializer': serializer, 'state': state})
     
-    if request.method == 'PUT':
+    def put(self, request, id):
+        state = get_object_or_404(State, pk=id)
         serializer = StateSerializer(state, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response({'serializer': serializer, 'state': state}) 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    if request.method == 'DELETE':
+    def delete(self, request, id):
+        state = get_object_or_404(State, pk=id)
         state.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    

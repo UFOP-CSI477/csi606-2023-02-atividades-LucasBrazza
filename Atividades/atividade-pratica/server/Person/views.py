@@ -1,45 +1,46 @@
-from django.shortcuts import render
-
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 from .models import Person
 from .serializers import PersonSerializer
 
-@api_view(['GET', 'POST'])
-def list_person(request):
-    if request.method == 'GET':
-        personList = Person.objects.all()
-        serializer = PersonSerializer(personList, many=True)
-        return Response(serializer.data)
+class PersonsList(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'Location/persons_list.html'
 
-    if request.method == 'POST':
+    def get(self, request):
+        persons = Person.objects.all()
+        serializer = PersonSerializer(persons, many=True)
+        return Response({"persons":serializer.data})
+    
+    def post(self, request):
         serializer = PersonSerializer(data=request.data)
-        if serializer.is_lavid():
+        if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
 
-@api_view(['GERT', 'PUT', 'DELETE'])
-def person_details(request, id):
-    try:
-        person = Person.objects.get(pk=id)
-    except Person.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    if request.method == 'GET':
+class PersonDetails(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'Location/person_details.html'
+
+    def get(self, request, id):
+        person = get_object_or_404(Person, pk=id)
         serializer = PersonSerializer(person)
-        return Response(serializer.data)
+        return Response({'serializer': serializer, 'person': person})
     
-    if request.method == 'PUT':
+    def put(self, request, id):
+        person = get_object_or_404(Person, pk=id)
         serializer = PersonSerializer(person, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response({'serializer': serializer, 'person': person}) 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    if request.method == 'DELETE':
+    def delete(self, request, id):
+        person = get_object_or_404(Person, pk=id)
         person.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-        
+    

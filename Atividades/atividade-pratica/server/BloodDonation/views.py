@@ -1,46 +1,46 @@
-from django.shortcuts import render
-
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 from .models import BloodDonation
 from .serializers import BloodDonationSerializer
 
-@api_view(['GET', 'POST'])
-def list_blooddonations(request):
-    
-    if request.method == 'GET':
-        blooddonations = BloodDonation.objects.all()
-        serializer = BloodDonationSerializer(blooddonations, many=True)
-        return Response(serializer.data)
+class BloodDonationsList(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'Location/blood_donations_list.html'
 
-    if request.method == 'POST':
+    def get(self, request):
+        blood_donations = BloodDonation.objects.all()
+        serializer = BloodDonationSerializer(blood_donations, many=True)
+        return Response({"blood_donations":serializer.data})
+    
+    def post(self, request):
         serializer = BloodDonationSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+
+class BloodDonationDetails(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'Location/blood_donation_details.html'
+
+    def get(self, request, id):
+        blood_donation = get_object_or_404(BloodDonation, pk=id)
+        serializer = BloodDonationSerializer(blood_donation)
+        return Response({'serializer': serializer, 'blood_donation': blood_donation})
     
-    
-@api_view(['GET', 'PUT', 'DELETE'])
-def blooddonation_details(request, id):
-    
-    try:
-        blooddonation = BloodDonation.objects.get(pk=id)
-    except BloodDonation.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    if request.method == 'GET':
-        serializer = BloodDonationSerializer(blooddonation)
-        return Response(serializer.data)
-    
-    if request.method == 'PUT':
-        serializer = BloodDonationSerializer(blooddonation, data=request.data)
+    def put(self, request, id):
+        blood_donation = get_object_or_404(BloodDonation, pk=id)
+        serializer = BloodDonationSerializer(blood_donation, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response({'serializer': serializer, 'blood_donation': blood_donation}) 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    if request.method == 'DELETE':
-        blooddonation.delete()
+    def delete(self, request, id):
+        blood_donation = get_object_or_404(BloodDonation, pk=id)
+        blood_donation.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
