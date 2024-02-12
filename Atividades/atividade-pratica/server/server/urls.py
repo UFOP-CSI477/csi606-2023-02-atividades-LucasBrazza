@@ -32,11 +32,10 @@ urlpatterns = [
     path('cities/<int:id>', city_views.CityDetails.as_view()),
     path('person/', person_views.PersonsList.as_view()),
     path('person/<int:id>', person_views.PersonDetails.as_view()),
-    path('bloodtypes/', bloodtype_views.BlodTypesList.as_view()),
+    path('bloodtypes/', bloodtype_views.BloodTypesList.as_view()),
     path('bloodtypes/<int:id>', bloodtype_views.BloodTypeDetails.as_view()),
     path('bloodcenters/', bloodcenter_views.BloodCentersList.as_view()),
     path('bloodcenters/<int:id>', bloodcenter_views.BloodCenterDetails.as_view()),
     path('blooddonations/', blooddonation_views.BloodDonationsList.as_view()),
     path('blooddonations/<int:id>', blooddonation_views.BloodDonationDetails.as_view()),
-    path('', bloodcenter_views.base_view)
 ]
