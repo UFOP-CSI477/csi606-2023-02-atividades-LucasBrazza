@@ -17,6 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from django.conf.urls.static import static
+from django.conf import settings
+
 from State import views as state_views
 from City import views as city_views
 from Person import views as person_views
@@ -39,3 +42,6 @@ urlpatterns = [
     path('blooddonations/', blooddonation_views.BloodDonationsList.as_view()),
     path('blooddonations/<int:id>', blooddonation_views.BloodDonationDetails.as_view()),
 ]
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
