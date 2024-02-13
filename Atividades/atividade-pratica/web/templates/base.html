@@ -26,11 +26,19 @@
   </head>
   <body>
       {% include 'navbar.html' %}
+      <div
+      class="bg-image"
+      style="
+      background-image: url('{% static 'bg-image.jpg' %}');
+      height: 100%;
+      width: 100%;  
+      "
 
-    <div class="container mt-20">
-      {% block content %}
+    >
+    {% block content %}
+  
+    {% endblock %}
+      </div>
 
-      {% endblock %}
-    </div>
   </body>
 </html>
