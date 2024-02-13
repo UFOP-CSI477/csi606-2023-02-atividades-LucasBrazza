@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      Blood Donation{% block title %}
+      {% endblock %}
+    </title>
+
+    
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Custom Icon -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+
+
+
+  </head>
+  <body>
+      {% include 'navbar.html' %}
+
+    <div class="container mt-20">
+      {% block content %}
+
+      {% endblock %}
+    </div>
+  </body>
+</html>
