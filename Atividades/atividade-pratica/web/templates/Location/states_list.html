@@ -1,10 +1,73 @@
 {% extends "../base.html" %}
+{% load rest_framework %}
+{% load static %}
+
+
 {% block content %}
-<html><body>
-    <h1>States</h1>
-    <ul>
-        {% for state in states %}
-        <li>{{ state.name }}</li>
-        {% endfor %}
-    </ul>
-    </body></html>
+<div
+class="card text-black opacity-75"
+>
+<div class="card-body">
+    <h4 class="card-title">States</h4>
+
+    <div class="table-responsive" >
+        <div class="table-responsive" >
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Acronym</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Action</th>
+                </tr>
+                </thead>
+
+                <tbody class="table-group-divider">
+                    <td class="">
+                        {% for state in states %}
+                        <tr>
+                            <td></td>
+                            <td>{{state.acronym}}</td>
+                            <td>{{state.name}}</td>
+                            <td>
+                                {% comment %} <a href="{% url 'server:state-detail' state.id %}" class="btn btn-primary">View</a> {% endcomment %}
+                                {% comment %} <a href="{% url 'state-update' state.id %}" class="btn btn-warning">Edit</a>
+                                <a href="{% url 'state-delete' state.id %}" class="btn btn-danger">Delete</a> {% endcomment %}
+                            </td>
+                        </tr>
+                        {% endfor %}    
+                        </td>
+
+                    </tbody>
+                    
+                </table>
+        </div>
+    </div>
+{% comment %} 
+    {% if is_paginated %}
+        <nav aria-label="States pagination">
+            <ul
+                class="pagination    "
+            >
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+
+                {% for i in  paginator.page_range %}
+                    <li class="page-item {% if page_obj == i %} active {% endif %}" aria-current="page">
+                        <a class="page-link" href="?page{{i}}">{{i}}</a>
+                    </li>
+                {% endfor %}
+
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    {% endif %} {% endcomment %}
+</div>
+{% endblock %}
