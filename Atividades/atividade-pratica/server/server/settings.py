@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     
     'rest_framework',
     'bootstrap5',
+    'crispy_forms',
+    "crispy_bootstrap5",
     
     'State',
     'City',
@@ -80,6 +82,10 @@ TEMPLATES = [
     },
 ]
 
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
 WSGI_APPLICATION = 'server.wsgi.application'
 
 
@@ -112,6 +118,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
