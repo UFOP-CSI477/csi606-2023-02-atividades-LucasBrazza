@@ -15,32 +15,22 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from django.conf.urls.static import static
 from django.conf import settings
 
-from State import views as state_views
-from City import views as city_views
-from Person import views as person_views
-from BloodType import views as bloodtype_views
-from BloodCenter import views as bloodcenter_views
-from BloodDonation import views as blooddonation_views
+from .homeview import HomePageView
 
 urlpatterns = [
+    path('', HomePageView.as_view(), name='home'),
     path('admin/', admin.site.urls),
-    path('states/', state_views.StatesList.as_view()),
-    path('states/<int:id>', state_views.StateDetails.as_view()),
-    path('cities/', city_views.CitiesList.as_view()),
-    path('cities/<int:id>', city_views.CityDetails.as_view()),
-    path('person/', person_views.PersonsList.as_view()),
-    path('person/<int:id>', person_views.PersonDetails.as_view()),
-    path('bloodtypes/', bloodtype_views.BloodTypesList.as_view()),
-    path('bloodtypes/<int:id>', bloodtype_views.BloodTypeDetails.as_view()),
-    path('bloodcenters/', bloodcenter_views.BloodCentersList.as_view()),
-    path('bloodcenters/<int:id>', bloodcenter_views.BloodCenterDetails.as_view()),
-    path('blooddonations/', blooddonation_views.BloodDonationsList.as_view()),
-    path('blooddonations/<int:id>', blooddonation_views.BloodDonationDetails.as_view()),
+    path('states/', include('State.urls'), name='state'),
+    path('cities/', include('City.urls'), name='city'),
+    path('persons/', include('Person.urls'), name='person'),
+    path('bloodtypes/', include('BloodType.urls'), name='bloodtype'),
+    path('bloodcenters/', include('BloodCenter.urls'), name='bloodcenter'),
+    path('blooddonations/', include('BloodDonation.urls'), name='blooddonation'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
