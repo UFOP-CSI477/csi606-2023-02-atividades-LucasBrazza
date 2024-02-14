@@ -11,3 +11,18 @@
 ## [Projeto final:](./Projeto/README.md)
 
 Apresente uma breve descrição do seu projeto.
+
+
+py -m venv atividade-pratica
+cd atividade-pratica
+.\Scripts\activate
+pip install django
+pip install djangorestframework
+django-admin startproject server
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+LINK/admin
+admin 
+admin
+
