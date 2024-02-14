@@ -1,46 +1,57 @@
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.renderers import TemplateHTMLRenderer
-from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import ListView, FormView, DeleteView, UpdateView
 from .models import Person
-from .serializers import PersonSerializer
+from .forms import PersonForm
 
-class PersonsList(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'Location/persons_list.html'
 
-    def get(self, request):
-        persons = Person.objects.all()
-        serializer = PersonSerializer(persons, many=True)
-        return Response({"persons":serializer.data})
+class PersonsList(ListView):
+    model = Person
+    template_name = 'Person/persons_list.html'
+    context_object_name = 'persons'
+    paginate_by = 6
     
-    def post(self, request):
-        serializer = PersonSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
-
-class PersonDetails(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'Location/person_details.html'
-
-    def get(self, request, id):
-        person = get_object_or_404(Person, pk=id)
-        serializer = PersonSerializer(person)
-        return Response({'serializer': serializer, 'person': person})
+    # @api_view(['GET'])
+    def get_queryset(self):
+        return super().get_queryset().order_by('name')
     
-    def put(self, request, id):
-        person = get_object_or_404(Person, pk=id)
-        serializer = PersonSerializer(person, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'serializer': serializer, 'person': person}) 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# fix csrf ond PersonFormView
+class PersonFormView(FormView):
+    template_name = 'Person/person_create.html'
+    form_class = PersonForm
+    success_url = reverse_lazy('persons-list')
     
-    def delete(self, request, id):
-        person = get_object_or_404(Person, pk=id)
-        person.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    # @api_view(['POST'])
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        print("form_invalid")
+        return super().form_invalid(form)
+
+class PersonUpdateView(UpdateView):
+    model = Person
+    template_name = 'Person/person_details.html'
+    form_class = PersonForm
+    success_url = reverse_lazy('persons-list')
+    
+    # @api_view(['POST'])
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        print("form_invalid: ", form)
+        return super().form_invalid(form)
+    
+
+class PersonDeleteView(DeleteView):
+    model = Person
+    success_url = reverse_lazy('persons-list')
+
+    def form_valid(self, form):
+        person_id = self.kwargs['pk']
+        person = Person.objects.get(pk=person_id) 
+        person.delete() 
+        return super().form_valid(form)
     

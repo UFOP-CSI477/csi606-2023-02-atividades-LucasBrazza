@@ -1,46 +1,56 @@
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.renderers import TemplateHTMLRenderer
-from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import ListView, FormView, DeleteView, UpdateView
 from .models import City
-from .serializers import CitySerializer
+from .forms import CityForm
 
-class CitiesList(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'Location/cities_list.html'
 
-    def get(self, request):
-        cities = City.objects.all()
-        serializer = CitySerializer(cities, many=True)
-        return Response({"cities":serializer.data})
+class CitiesList(ListView):
+    model = City
+    template_name = 'City/cities_list.html'
+    context_object_name = 'cities'
+    paginate_by = 6
     
-    def post(self, request):
-        serializer = CitySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
-
-class CityDetails(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'Location/city_details.html'
-
-    def get(self, request, id):
-        city = get_object_or_404(City, pk=id)
-        serializer = CitySerializer(city)
-        return Response({'serializer': serializer, 'city': city})
+    # @api_view(['GET'])
+    def get_queryset(self):
+        return super().get_queryset().order_by('name')
     
-    def put(self, request, id):
-        city = get_object_or_404(City, pk=id)
-        serializer = CitySerializer(city, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'serializer': serializer, 'city': city}) 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class CityFormView(FormView):
+    template_name = 'City/city_create.html'
+    form_class = CityForm
+    success_url = reverse_lazy('cities-list')
     
-    def delete(self, request, id):
-        city = get_object_or_404(City, pk=id)
-        city.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    # @api_view(['POST'])
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        print("form_invalid")
+        return super().form_invalid(form)
+
+class CityUpdateView(UpdateView):
+    model = City
+    template_name = 'City/city_details.html'
+    form_class = CityForm
+    success_url = reverse_lazy('cities-list')
+    
+    # @api_view(['POST'])
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        print("form_invalid: ", form)
+        return super().form_invalid(form)
+    
+
+class CityDeleteView(DeleteView):
+    model = City
+    success_url = reverse_lazy('cities-list')
+
+    def form_valid(self, form):
+        city_id = self.kwargs['pk']
+        city = City.objects.get(pk=city_id) 
+        city.delete() 
+        return super().form_valid(form)
     

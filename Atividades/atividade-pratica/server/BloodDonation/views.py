@@ -1,46 +1,57 @@
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.renderers import TemplateHTMLRenderer
-from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import ListView, FormView, DeleteView, UpdateView
 from .models import BloodDonation
-from .serializers import BloodDonationSerializer
+from .forms import BloodDonationForm
 
-class BloodDonationsList(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'Donation/blood_donations_list.html'
 
-    def get(self, request):
-        blood_donations = BloodDonation.objects.all()
-        serializer = BloodDonationSerializer(blood_donations, many=True)
-        return Response({"blood_donations":serializer.data})
+class BloodDonationsList(ListView):
+    model = BloodDonation
+    template_name = 'BloodDonation/blooddonations_list.html'
+    context_object_name = 'blooddonations'
+    paginate_by = 6
     
-    def post(self, request):
-        serializer = BloodDonationSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
-
-class BloodDonationDetails(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'Donation/blood_donation_details.html'
-
-    def get(self, request, id):
-        blood_donation = get_object_or_404(BloodDonation, pk=id)
-        serializer = BloodDonationSerializer(blood_donation)
-        return Response({'serializer': serializer, 'blood_donation': blood_donation})
+    # @api_view(['GET'])
+    def get_queryset(self):
+        return super().get_queryset().order_by('date')
     
-    def put(self, request, id):
-        blood_donation = get_object_or_404(BloodDonation, pk=id)
-        serializer = BloodDonationSerializer(blood_donation, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'serializer': serializer, 'blood_donation': blood_donation}) 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# fix csrf ond BloodDonationFormView
+class BloodDonationFormView(FormView):
+    template_name = 'BloodDonation/blooddonation_create.html'
+    form_class = BloodDonationForm
+    success_url = reverse_lazy('blooddonations-list')
     
-    def delete(self, request, id):
-        blood_donation = get_object_or_404(BloodDonation, pk=id)
-        blood_donation.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    # @api_view(['POST'])
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        print("form_invalid")
+        return super().form_invalid(form)
+
+class BloodDonationUpdateView(UpdateView):
+    model = BloodDonation
+    template_name = 'BloodDonation/blooddonation_details.html'
+    form_class = BloodDonationForm
+    success_url = reverse_lazy('blooddonations-list')
+    
+    # @api_view(['POST'])
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        print("form_invalid: ", form)
+        return super().form_invalid(form)
+    
+
+class BloodDonationDeleteView(DeleteView):
+    model = BloodDonation
+    success_url = reverse_lazy('blooddonations-list')
+
+    def form_valid(self, form):
+        blooddonation_id = self.kwargs['pk']
+        blooddonation = BloodDonation.objects.get(pk=blooddonation_id) 
+        blooddonation.delete() 
+        return super().form_valid(form)
     
