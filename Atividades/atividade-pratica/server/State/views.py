@@ -1,46 +1,57 @@
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.renderers import TemplateHTMLRenderer
-from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import ListView, FormView, DeleteView, UpdateView
 from .models import State
-from .serializers import StateSerializer
+from .forms import StateForm
 
-class StatesList(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'Location/states_list.html'
 
-    def get(self, request):
-        states = State.objects.all()
-        serializer = StateSerializer(states, many=True)
-        return Response({"states":serializer.data})
+class StatesList(ListView):
+    model = State
+    template_name = 'State/states_list.html'
+    context_object_name = 'states'
+    paginate_by = 6
     
-    def post(self, request):
-        serializer = StateSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
-
-class StateDetails(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'Location/state_details.html'
-
-    def get(self, request, id):
-        state = get_object_or_404(State, pk=id)
-        serializer = StateSerializer(state)
-        return Response({'serializer': serializer, 'state': state})
+    # @api_view(['GET'])
+    def get_queryset(self):
+        return super().get_queryset().order_by('name')
     
-    def put(self, request, id):
-        state = get_object_or_404(State, pk=id)
-        serializer = StateSerializer(state, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'serializer': serializer, 'state': state}) 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# fix csrf ond StateFormView
+class StateFormView(FormView):
+    template_name = 'State/state_create.html'
+    form_class = StateForm
+    success_url = reverse_lazy('states-list')
     
-    def delete(self, request, id):
-        state = get_object_or_404(State, pk=id)
-        state.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    # @api_view(['POST'])
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        print("form_invalid")
+        return super().form_invalid(form)
+
+class StateUpdateView(UpdateView):
+    model = State
+    template_name = 'State/state_details.html'
+    form_class = StateForm
+    success_url = reverse_lazy('states-list')
+    
+    # @api_view(['POST'])
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        print("form_invalid: ", form)
+        return super().form_invalid(form)
+    
+
+class StateDeleteView(DeleteView):
+    model = State
+    success_url = reverse_lazy('states-list')
+
+    def form_valid(self, form):
+        state_id = self.kwargs['pk']
+        state = State.objects.get(pk=state_id) 
+        state.delete() 
+        return super().form_valid(form)
     
