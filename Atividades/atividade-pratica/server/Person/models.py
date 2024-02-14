@@ -17,4 +17,4 @@ class Person(models.Model):
         return self.street + ', ' + self.number + ' - ' + self.complement + ' - ' + self.cityId.name + '/' + self.cityId.stateId.acronym
 
     def __str__(self):
-        return f'{self.name} + {self.rg}'
+        return f'{self.name} - {self.rg}'

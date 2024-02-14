@@ -13,3 +13,6 @@ class City(models.Model):
     def getNameAndState(self):
         state = State.getAcronym(pk=self.stateId)
         return self.name + ' / ' + state
+    
+    def getCityState(self):
+        return State.getAcronym(self.stateId)

@@ -9,6 +9,9 @@ class BloodCenter(models.Model):
     cityId = models.ForeignKey(City, on_delete=models.CASCADE)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.name + ' - ' + self.cityId.name
 
     def get_address(self):
         return self.street + ', ' + self.number + ' - ' + self.complement + ' - ' + self.cityId.name + '/' + self.cityId.stateId.acronym
@@ -18,4 +21,7 @@ class BloodCenter(models.Model):
     
     def getCityInfo(self):
         return City.getNameAndState(pk=self.cityId)
+    
+    def getNameCityState(self):
+        return self.name + ' - ' + City.getNameAndState(pk=self.cityId)
 
