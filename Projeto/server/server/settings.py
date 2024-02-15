@@ -37,6 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
+    'rest_framework',
+    'crispy_forms',
+    
+    'User',
 ]
 
 MIDDLEWARE = [
@@ -48,6 +53,16 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+
+}
+
 
 ROOT_URLCONF = 'server.urls'
 
@@ -80,6 +95,7 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'User.UserModel'  # Substitua 'myapp' pelo nome do seu aplicativo
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
