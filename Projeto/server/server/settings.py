@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-7v24!sjx5ph(e$4s@@)a_8&1sy$o_9)1q$b$^1&2jp#$7rjoaq'
+SECRET_KEY = 'django-insecure-^$1$u3+!hw-)+75da5=hn3r)l@2u-+2blbzu^ee$o_iy*#6b8j'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -39,9 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'rest_framework',
-    'crispy_forms',
+    # 'crispy-forms',
     
     'User',
+    'Vehicles',
 ]
 
 MIDDLEWARE = [
@@ -53,16 +54,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ]
-
-}
-
 
 ROOT_URLCONF = 'server.urls'
 
@@ -95,7 +86,8 @@ DATABASES = {
     }
 }
 
-AUTH_USER_MODEL = 'User.UserModel'  # Substitua 'myapp' pelo nome do seu aplicativo
+
+AUTH_USER_MODEL = 'User.UserModel'  
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

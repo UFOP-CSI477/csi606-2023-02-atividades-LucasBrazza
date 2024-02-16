@@ -4,13 +4,13 @@ from django.views.generic import View
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
-from .models import UserDriverModel, UserClientModel
+from .models import UserModel
 from .serializers import UserDriverSerializer, UserClientSerializer
 from . import permissions
 
 
 class CreateDriverUserView(generics.CreateAPIView):
-    queryset = UserDriverModel.objects.all()
+    queryset = UserModel.objects.all()
     serializer_class = UserDriverSerializer
     permission_classes = [permissions.IsNotAuthenticated]
 
@@ -23,7 +23,7 @@ class CreateDriverUserView(generics.CreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CreateClientUserView(generics.CreateAPIView):
-    queryset = UserClientModel.objects.all()
+    queryset = UserModel.objects.all()
     serializer_class = UserClientSerializer
     permission_classes = [permissions.IsNotAuthenticated]
 
@@ -38,7 +38,7 @@ class CreateClientUserView(generics.CreateAPIView):
 
 
 class UpdateDriverUserView(generics.UpdateAPIView):
-    queryset = UserDriverModel.objects.all()
+    queryset = UserModel.objects.all()
     serializer_class = UserDriverSerializer
     permission_classes = [permissions.IsOwnerOrSysManager]
 
@@ -52,7 +52,7 @@ class UpdateDriverUserView(generics.UpdateAPIView):
 
 
 class UpdateClientUserView(generics.UpdateAPIView):
-    queryset = UserClientModel.objects.all()
+    queryset = UserModel.objects.all()
     serializer_class = UserClientSerializer
     permission_classes = [permissions.IsOwnerOrSysManager]
 

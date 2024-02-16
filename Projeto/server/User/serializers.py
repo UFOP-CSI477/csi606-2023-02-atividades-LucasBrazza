@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from .models import UserDriverModel, UserClientModel
+from .models import UserModel
 
 class UserDriverSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={"input_type": "password"}, write_only=True)
     
     class Meta:
-        model = UserDriverModel
+        model = UserModel
         fields = [
             'id', 
             'name', 
@@ -14,8 +14,7 @@ class UserDriverSerializer(serializers.ModelSerializer):
             'password', 
             'password2',
             'phone', 
-            'driver_license', 
-            'vehicles_list'
+            'driver_license'
         ]
         extra_kwargs = {
             'password': {'write_only': True}, 
@@ -29,7 +28,7 @@ class UserClientSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={"input_type": "password"}, write_only=True)
     
     class Meta:
-        model = UserClientModel
+        model = UserModel
         fields = [
             'id', 
             'name', 
