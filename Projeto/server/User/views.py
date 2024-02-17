@@ -5,8 +5,8 @@ from rest_framework.generics import CreateAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import UserModel
-from .serializers import UserDriverSerializer, UserClientSerializer
-from User.permissions import IsOwnerOrSysManager, IsClientOrDriver, IsDriverOrSysManager, IsNotAuthenticated
+from .serializers import UserDriverSerializer, UserPassengerSerializer
+from User.permissions import IsOwnerOrSysManager, IsPassengerOrDriver, IsDriverOrSysManager, IsNotAuthenticated
 
 
 class CreateDriverUserView(CreateAPIView):
@@ -22,9 +22,9 @@ class CreateDriverUserView(CreateAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class CreateClientUserView(CreateAPIView):
+class CreatePassengerUserView(CreateAPIView):
     queryset = UserModel.objects.all()
-    serializer_class = UserClientSerializer
+    serializer_class = UserPassengerSerializer
     permission_classes = [IsNotAuthenticated]
 
     def create(self, request, *args, **kwargs):
@@ -51,9 +51,9 @@ class UpdateDriverUserView(UpdateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UpdateClientUserView(UpdateAPIView):
+class UpdatePassengerUserView(UpdateAPIView):
     queryset = UserModel.objects.all()
-    serializer_class = UserClientSerializer
+    serializer_class = UserPassengerSerializer
     permission_classes = [IsOwnerOrSysManager]
 
     def update(self, request, *args, **kwargs):

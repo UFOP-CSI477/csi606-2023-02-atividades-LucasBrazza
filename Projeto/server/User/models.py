@@ -5,7 +5,7 @@ class UserModel(AbstractUser):
     
     USER_TYPES = (
         ('driver', 'Driver'),
-        ('client', 'Client'),
+        ('passenger', 'Passenger'),
         ('sys_manager', 'Manager')
     )
     

@@ -5,10 +5,10 @@ class IsOwnerOrSysManager(permissions.BasePermission):
         # Verifica se o usuário é o próprio usuário ou se é um sys_manager
         return obj == request.user or (request.user.type == 'sys_manager')
 
-class IsClientOrDriver(permissions.BasePermission):
+class IsPassengerOrDriver(permissions.BasePermission):
     def has_permission(self, request, view):
-        # Verifica se o usuário é cliente ou motorista
-        return request.user.type in ['client', 'driver']
+        # Verifica se o usuário é passengere ou motorista
+        return request.user.type in ['passenger', 'driver']
 
 class IsDriverOrSysManager(permissions.BasePermission):
     def has_permission(self, request, view):
