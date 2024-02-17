@@ -63,6 +63,15 @@ class UpdateClientUserView(generics.UpdateAPIView):
             self.perform_update(serializer)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class DeleteUserView(generics.DestroyAPIView):
+    queryset = UserModel.objects.all()
+    permission_classes = [IsOwnerOrSysManager]
+    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class LoginView(View):
     def post(self, request):
