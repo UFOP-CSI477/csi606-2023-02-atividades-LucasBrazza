@@ -1,12 +1,10 @@
 from rest_framework import serializers
-from .models import TripModel, PassengerTripMode
+from .models import TripModel, PassengerTripModel
 from Vehicles.models import VehicleModel
-from .models import PassengerTripModel
 from rest_framework.serializers import ModelSerializer
-from User.models import User
 class PassengerTripModeSerializer(ModelSerializer):
     class Meta:
-        model = PassengerTripMode
+        model = PassengerTripModel
         fields = ['trip', 'passenger']
 
 
@@ -37,7 +35,7 @@ class TripSerializer(ModelSerializer):
             return obj.vehicle.seats_quantity - obj.vacancies
         
 
-class PassengerTripModelSerializer(ModelSerializer):
+class PassengerTripSerializer(ModelSerializer):
     class Meta:
         model = PassengerTripModel
         fields = ['trip', 'passenger']
