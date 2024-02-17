@@ -1,7 +1,11 @@
 from django.db import models
 from User.models import UserModel
 
-class Vehicle(models.Model):
+class VehicleModel(models.Model):
+    
+    class Meta:
+        verbose_name = 'Vehicle'
+        
     ENUM_VECHICLE_TYPE = (
         ('car', 'Car'),
         ('van', 'Van'),

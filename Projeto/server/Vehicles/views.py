@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView
 from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView
-from .models import Vehicle
+from .models import VehicleModel
 from .serializers import VehicleCreateSerializer, VehicleSerializer
 from User.permissions import IsOwnerOrSysManager, IsClientOrDriver, IsDriverOrSysManager, IsNotAuthenticated
 from rest_framework.response import Response
@@ -9,19 +9,19 @@ from rest_framework import status
 
 
 
-from .models import Vehicle
+from .models import VehicleModel
 
 class UserVehiclesListView(ListAPIView):
-    model = Vehicle
+    model = VehicleModel
     serializer_class = VehicleSerializer
     permission_classes = [IsDriverOrSysManager]
     
     def get_queryset(self):
         user_id = self.kwargs['user_id']
-        return Vehicle.objects.filter(users__id=user_id)
+        return VehicleModel.objects.filter(users__id=user_id)
 
 class VehicleCreateView(CreateAPIView):
-    queryset = Vehicle.objects.all()
+    queryset = VehicleModel.objects.all()
     serializer_class = VehicleCreateSerializer
     permission_classes = [IsDriverOrSysManager]
 
@@ -40,7 +40,7 @@ class VehicleCreateView(CreateAPIView):
     
 
 class VehicleDeleteView(DestroyAPIView):
-    queryset = Vehicle.objects.all()
+    queryset = VehicleModel.objects.all()
     serializer_class = VehicleSerializer
     permission_classes = [IsOwnerOrSysManager]
     

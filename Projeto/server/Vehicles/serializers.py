@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from .models import Vehicle, VehicleType
+from .models import VehicleModel, VehicleType
 
 class VehicleSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Vehicle
+        model = VehicleModel
         fields = ['plate', 'type', 'seats_quantity']
 
 
