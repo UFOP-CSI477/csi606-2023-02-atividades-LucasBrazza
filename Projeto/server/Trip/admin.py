@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import TripModel, PassengerTripModel
 
-# Register your models here.
+admin.site.register(TripModel)
+admin.site.register(PassengerTripModel)

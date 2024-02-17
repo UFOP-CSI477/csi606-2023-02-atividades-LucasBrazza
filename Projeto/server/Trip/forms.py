@@ -1,8 +1,6 @@
 from django import forms
 from django.forms import ModelForm, ValidationError
 from .models import Trip
-from Vehicles.models import Vehicle
-from Driver.models import Driver
 import datetime
 
 

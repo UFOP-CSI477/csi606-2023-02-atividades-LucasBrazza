@@ -3,14 +3,19 @@ from django.urls import reverse_lazy
 from rest_framework import permissions, serializers, viewsets, status
 from rest_framework.response import Response 
 from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
-from Vehicles.models import Vehicle
+from Vehicles.models import VehicleModel
 from .models import TripModel, PassengerTripModel
 from .serializers import PassengerTripModelSerializer, TripSerializer
 from User.permissions import IsDriverOrSysManager, IsPassengerOrDriver, IsNotAuthenticated
-class CreateTripView(CreateAPIView):
+
+class TripCreateView(CreateAPIView):
     queryset = TripModel.objects.all()
     serializer_class = TripSerializer
     permission_classes = [IsDriverOrSysManager]
+
+    def perform_create(self, serializer):
+        # Set the driver to the current user
+        serializer.save(driver=self.request.user)
 
 
 class ListTripView(ListAPIView):
@@ -61,6 +66,7 @@ class UserTripListView(ListAPIView):
 
 class BookTripView(CreateAPIView):
     serializer_class = PassengerTripModelSerializer
+    permission_classes = [IsPassengerOrDriver]
     
     def create(self, request, *args, **kwargs):
         # Obtém os dados da solicitação

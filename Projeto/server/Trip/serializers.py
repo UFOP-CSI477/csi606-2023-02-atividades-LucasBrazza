@@ -1,15 +1,16 @@
 from rest_framework import serializers
 from .models import TripModel, PassengerTripMode
-from Vehicles.models import Vehicle
+from Vehicles.models import VehicleModel
 from .models import PassengerTripModel
-
-class PassengerTripModeSerializer(serializers.ModelSerializer):
+from rest_framework.serializers import ModelSerializer
+from User.models import User
+class PassengerTripModeSerializer(ModelSerializer):
     class Meta:
         model = PassengerTripMode
         fields = ['trip', 'passenger']
 
 
-class TripSerializer(serializers.ModelSerializer):
+class TripSerializer(ModelSerializer):
     passengers = PassengerTripModeSerializer(many=True, read_only=True)
     
     class Meta:
@@ -27,17 +28,17 @@ class TripSerializer(serializers.ModelSerializer):
         
         def create(self, validated_data):
             if self.context["request"].user.user_type != "driver": 
-                raise serializers.ValidationError("Only drivers can create trips")
+                raise serializers.ValidationError("Apenas motoristas podem criar viagens.")
             validated_data["driver"] = self.context["request"].user
-            validated_data["seats_taken"] = Vehicle.objects.get(id=validated_data["vehicle"]).seats - validated_data["vacancies"]
-            trip = TripModel.objects.create(**validated_data)
-            passengers = validated_data.pop('passengers')
-            for passenger in passengers:
-                PassengerTripMode.objects.create(trip=trip, passenger=passenger)
-            return trip
+            validated_data["seats_taken"] = VehicleModel.objects.get(id=validated_data["vehicle"]).seats - validated_data["vacancies"]
+            return TripModel.objects.create(**validated_data)
+
+        def get_seats_taken(self, obj):
+            return obj.vehicle.seats_quantity - obj.vacancies
         
 
 class PassengerTripModelSerializer(ModelSerializer):
     class Meta:
         model = PassengerTripModel
         fields = ['trip', 'passenger']
+        
