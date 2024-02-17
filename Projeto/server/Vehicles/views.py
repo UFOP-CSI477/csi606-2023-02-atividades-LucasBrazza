@@ -4,12 +4,14 @@ from rest_framework.generics import ListAPIView, CreateAPIView
 from .models import Vehicle
 from .serializers import VehicleCreateSerializer, VehicleSerializer
 from User.permissions import IsOwnerOrSysManager, IsClientOrDriver, IsDriverOrSysManager, IsNotAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 
 
 
 from .models import Vehicle
 
-class UserVehiclesView(ListAPIView):
+class UserVehiclesListView(ListAPIView):
     model = Vehicle
     serializer_class = VehicleSerializer
     
@@ -34,5 +36,4 @@ class VehicleCreateView(CreateAPIView):
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
     
