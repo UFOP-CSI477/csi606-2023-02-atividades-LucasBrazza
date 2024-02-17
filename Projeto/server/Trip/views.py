@@ -42,7 +42,7 @@ class SearchTripView(ListAPIView):
         
         return queryset
     
-class CompleteTripView(DestroyAPIView):
+class FinishedTripView(DestroyAPIView):
     queryset = TripModel.objects.all()
     serializer_class = TripSerializer
     permission_classes = [IsDriverOrSysManager]
