@@ -1,10 +1,14 @@
 from django.urls import path
-from . import views
+from .views import (
+    CreateDriverUserView, CreatePassengerUserView,
+    UpdateDriverUserView, UpdatePassengerUserView,
+    DeleteUserView
+)
 
 urlpatterns = [
-    path('passenger/signup/', views.CreatePassengerUserView.as_view(), name='singup-passenger'),
-    path('driver/singup/', views.CreateDriverUserView.as_view(), name='singup-driver'),
-    path('login/', views.LoginView.as_view(), name='login'),
-    path('logout/', views.LogoutView.as_view(), name='logout'),
-    # outras URLs do seu aplicativo
+    path('driver/create/', CreateDriverUserView.as_view(), name='singup-driver'),
+    path('passenger/create/', CreatePassengerUserView.as_view(), name='singup-passenger'),
+    path('driver/update/<int:pk>/', UpdateDriverUserView.as_view(), name='update_driver_user'),
+    path('passenger/update/<int:pk>/', UpdatePassengerUserView.as_view(), name='update_passenger_user'),
+    path('user/delete/<int:pk>/', DeleteUserView.as_view(), name='delete_user'),
 ]
