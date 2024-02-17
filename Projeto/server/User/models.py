@@ -3,6 +3,9 @@ from django.contrib.auth.models import AbstractUser
 
 class UserModel(AbstractUser):
     
+    class Meta:
+        verbose_name = 'User'
+    
     USER_TYPES = (
         ('driver', 'Driver'),
         ('passenger', 'Passenger'),
