@@ -6,13 +6,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import UserModel
 from .serializers import UserDriverSerializer, UserClientSerializer
-from . import permissions
+from User.permissions import IsOwnerOrSysManager, IsClientOrDriver, IsDriverOrSysManager, IsNotAuthenticated
 
 
 class CreateDriverUserView(generics.CreateAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserDriverSerializer
-    permission_classes = [permissions.IsNotAuthenticated]
+    permission_classes = [IsNotAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -25,7 +25,7 @@ class CreateDriverUserView(generics.CreateAPIView):
 class CreateClientUserView(generics.CreateAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserClientSerializer
-    permission_classes = [permissions.IsNotAuthenticated]
+    permission_classes = [IsNotAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -40,7 +40,7 @@ class CreateClientUserView(generics.CreateAPIView):
 class UpdateDriverUserView(generics.UpdateAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserDriverSerializer
-    permission_classes = [permissions.IsOwnerOrSysManager]
+    permission_classes = [IsOwnerOrSysManager]
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -54,7 +54,7 @@ class UpdateDriverUserView(generics.UpdateAPIView):
 class UpdateClientUserView(generics.UpdateAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserClientSerializer
-    permission_classes = [permissions.IsOwnerOrSysManager]
+    permission_classes = [IsOwnerOrSysManager]
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
