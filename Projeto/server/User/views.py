@@ -1,11 +1,12 @@
-from django.contrib.auth import authenticate, login,  logout
+from django.contrib.auth import login,  logout, authenticate
 from django.shortcuts import redirect
 from django.views.generic import View
-from rest_framework.generics import CreateAPIView, UpdateAPIView, DestroyAPIView
+from rest_framework.generics import CreateAPIView, UpdateAPIView, DestroyAPIView, GenericAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import UserModel
-from .serializers import UserDriverSerializer, UserPassengerSerializer
+from .authentication import CustomAuthentication
+from .serializers import UserDriverSerializer, UserPassengerSerializer, LoginSerializer
 from User.permissions import IsOwnerOrSysManager, IsPassengerOrDriver, IsDriverOrSysManager, IsNotAuthenticated
 
 
@@ -13,6 +14,7 @@ class CreateDriverUserView(CreateAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserDriverSerializer
     permission_classes = [IsNotAuthenticated]
+
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -25,7 +27,6 @@ class CreateDriverUserView(CreateAPIView):
 class CreatePassengerUserView(CreateAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserPassengerSerializer
-    permission_classes = [IsNotAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -51,18 +52,25 @@ class UpdateDriverUserView(UpdateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UpdatePassengerUserView(UpdateAPIView):
+class UpdatePassengerUserView(RetrieveAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserPassengerSerializer
     permission_classes = [IsOwnerOrSysManager]
 
     def update(self, request, *args, **kwargs):
+        print(request.user)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data)
         if serializer.is_valid():
             self.perform_update(serializer)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self, request, *args, **kwargs):
+        print(request.user)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
     
 class DeleteUserView(DestroyAPIView):
     queryset = UserModel.objects.all()
@@ -73,18 +81,29 @@ class DeleteUserView(DestroyAPIView):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class LoginView(View):
-    def post(self, request):
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('home')  # Redirecione para a página inicial após o login
+
+class LoginView(GenericAPIView):
+    serializer_class = LoginSerializer
+    renderer_classes
+
+    def post(self, request, *args, **kwargs):
+        serializer = LoginSerializer
+        print('serializer', serializer)
+        validated_data = serializer.validate(self=serializer, data=request.data)
+
+        if validated_data is not None:
+            login(request, validated_data)
+            return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
         else:
-            return redirect('create_user')  # Redirecione para a página de criação de usuário se o login falhar
-        
-        
+            # Verifique se o usuário existe e se as credenciais estão corretas
+            try:
+                UserModel.objects.get(username=serializer.validated_data['username'])
+            except UserModel.DoesNotExist:
+                return Response({'error': 'Usuário não encontrado'}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response({'error': 'Senha incorreta'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+                
 class LogoutView(View):
     def get(self, request):
         logout(request)
