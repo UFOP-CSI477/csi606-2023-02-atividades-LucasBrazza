@@ -14,6 +14,7 @@ from .models import Vehicle
 class UserVehiclesListView(ListAPIView):
     model = Vehicle
     serializer_class = VehicleSerializer
+    permission_classes = [IsDriverOrSysManager]
     
     def get_queryset(self):
         user_id = self.kwargs['user_id']
@@ -22,7 +23,7 @@ class UserVehiclesListView(ListAPIView):
 class VehicleCreateView(CreateAPIView):
     queryset = Vehicle.objects.all()
     serializer_class = VehicleCreateSerializer
-    permission_classes = [IsClientOrDriver, IsDriverOrSysManager]
+    permission_classes = [IsDriverOrSysManager]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
