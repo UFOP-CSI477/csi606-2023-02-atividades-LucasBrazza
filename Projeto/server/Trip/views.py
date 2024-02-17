@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
 from Vehicles.models import VehicleModel
 from .models import TripModel, PassengerTripModel
-from .serializers import PassengerTripModelSerializer, TripSerializer
+from .serializers import PassengerTripSerializer, TripSerializer
 from User.permissions import IsDriverOrSysManager, IsPassengerOrDriver, IsNotAuthenticated
 
 class TripCreateView(CreateAPIView):
@@ -49,29 +49,28 @@ class CompleteTripView(DestroyAPIView):
     
     
 
-class UserTripListView(ListAPIView):
+class PassengerTripListView(ListAPIView):
+    serializer_class = PassengerTripSerializer
+    
+    def get_queryset(self):        
+        return PassengerTripModel.objects.get(passenger=self.request.user)
+    
+
+class DriverTripListView(ListAPIView):
     serializer_class = TripSerializer
     
     def get_queryset(self):
-        queryset = TripModel.objects.all()
-        user_id = self.request.user.id
-        user_type = self.request.user.type
-        
-        if user_type == 'driver':
-            queryset = queryset.filter(driver_id=user_id)
-        elif user_type == 'passenger':
-            queryset = queryset.filter(passengers__id=user_id)
-        
-        return queryset
+        return TripModel.objects.get(driver=self.request.user)
+
 
 class BookTripView(CreateAPIView):
-    serializer_class = PassengerTripModelSerializer
+    serializer_class = PassengerTripSerializer
     permission_classes = [IsPassengerOrDriver]
     
     def create(self, request, *args, **kwargs):
         # Obtém os dados da solicitação
         trip_id = request.data.get('trip')
-        passenger_id = request.user.id
+        passenger = request.user
         
         # Verifica se a viagem existe
         try:
@@ -84,11 +83,11 @@ class BookTripView(CreateAPIView):
             return Response({"error": "Não há vagas disponíveis para esta viagem"}, status=status.HTTP_400_BAD_REQUEST)
         
         # Verifica se o passageiro já está na viagem
-        if trip.passengers.filter(id=passenger_id).exists():
+        if trip.passengers.filter(passenger).exists():
             return Response({"error": "Você já está nesta viagem"}, status=status.HTTP_400_BAD_REQUEST)
         
         # Cria a relação entre a viagem e o passageiro
-        PassengerTripModel.objects.create(trip=trip, passenger_id=passenger_id)
+        PassengerTripModel.objects.create(trip=trip, passenger_id=passenger)
         
         # Atualiza a quantidade de vagas disponíveis
         trip.vacancies -= 1
