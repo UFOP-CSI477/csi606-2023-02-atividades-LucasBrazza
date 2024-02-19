@@ -44,13 +44,12 @@ Para criar um ambiente virtual e instalar as dependências necessárias, siga os
 
 ### 6. Referências
 
-(Referências podem ser incluídas, caso necessário, seguindo o padrão ABNT.)
 
-Youtube. Criando um ambiente virtual com Python (venv) - Curso de Python #10. Disponível em: https://www.youtube.com/watch?v=A_j5TAhY3sw. Acesso em: [coloque a data de acesso aqui, por exemplo: 18 fev. 2024].
+- Youtube. Criando um ambiente virtual com Python (venv) - Curso de Python #10. Disponível em: https://www.youtube.com/watch?v=A_j5TAhY3sw. Acesso em: [coloque a data de acesso aqui, por exemplo: 18 fev. 2024].
 
-Django REST Framework. Disponível em: https://www.django-rest-framework.org. Acesso em: [coloque a data de acesso aqui].
+- Django REST Framework. Disponível em: https://www.django-rest-framework.org. Acesso em: [coloque a data de acesso aqui].
 
-Django Documentation. Models - Django documentation. Disponível em: https://docs.djangoproject.com/en/5.0/topics/db/models/. Acesso em: [coloque a data de acesso aqui].
+- Django Documentation. Models - Django documentation. Disponível em: https://docs.djangoproject.com/en/5.0/topics/db/models/. Acesso em: [coloque a data de acesso aqui].
 
-Youtube. Django Tutorial for Beginners - Full Course. Disponível em: https://www.youtube.com/watch?v=ElYj7lI3YMQ. Acesso em: [coloque a data de acesso aqui].
+- Youtube. Django Tutorial for Beginners - Full Course. Disponível em: https://www.youtube.com/watch?v=ElYj7lI3YMQ. Acesso em: [coloque a data de acesso aqui].
 
