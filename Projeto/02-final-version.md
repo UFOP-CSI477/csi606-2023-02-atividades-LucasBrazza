@@ -14,7 +14,6 @@ Este trabalho apresenta o desenvolvimento de um sistema de reserva de assentos e
 - Implementei a exibição de viagens disponíveis para o dia selecionado.
 - Criei a possibilidade de reserva de assentos em viagens selecionadas.
 - Adicionei funcionalidades para que motoristas possam registrar veículos, indicar quantidade de lugares disponíveis e disponibilizar viagens.
-- Desenvolvi uma interface amigável para facilitar a interação dos usuários e motoristas com o sistema.
 
 ### 2. Funcionalidades previstas e não implementadas
 
