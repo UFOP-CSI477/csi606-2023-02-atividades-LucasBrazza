@@ -40,6 +40,7 @@ Para criar um ambiente virtual e instalar as dependências necessárias, siga os
 3. Ative o ambiente virtual com o comando `source myenv/bin/activate` (Linux/Mac) ou `myenv\Scripts\activate` (Windows).
 4. Com o ambiente virtual ativado, instale as dependências usando o pip:
 `pip install django djangorestframework django-bootstrap-v5`
+5. Navege até a pirmeira pasta `server` e digite `py manage.py runserver`, entao o servidor será inicializado na porta indicada.
 
 
 ### 6. Referências
