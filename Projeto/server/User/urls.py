@@ -8,7 +8,10 @@ from .views import (
 urlpatterns = [
     path('driver/create/', CreateDriverUserView.as_view(), name='singup-driver'),
     path('passenger/create/', CreatePassengerUserView.as_view(), name='singup-passenger'),
-    path('driver/update/<int:pk>/', UpdateDriverUserView.as_view(), name='update_driver_user'),
-    path('passenger/update/<int:pk>/', UpdatePassengerUserView.as_view(), name='update_passenger_user'),
-    path('user/delete/<int:pk>/', DeleteUserView.as_view(), name='delete_user'),
+    path('driver/update/<int:driver_up>/', UpdateDriverUserView.as_view(), name='update-driver'),
+    path('driver/update/', UpdateDriverUserView.as_view(), name='update-driver'),
+    path('passenger/update/<int:pass_up>/', UpdatePassengerUserView.as_view(), name='update-passenger'),
+    path('passenger/update/', UpdatePassengerUserView.as_view(), name='update-passenger'),
+    path('delete/<int:driver_delete>/', DeleteUserView.as_view(), name='delete-user'),
+    path('delete/', DeleteUserView.as_view(), name='delete-user'),
 ]

@@ -1,0 +1,127 @@
+{% load bootstrap5 %}
+{% load crispy_forms_tags %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors" />
+    <meta name="generator" content="Hugo 0.84.0" />
+    <title>TripHike</title>
+    <style>
+      body {
+        background-color: #f3f3f3;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .container {
+        background-color: #fff;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" style="max-width: 33rem; margin: 0 auto; padding: 5rem 2rem; border: 1px solid #ddd; border-radius: 0.5rem; box-shadow: 0 0 1rem 0 rgba(0,0,0,0.1);">
+      <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingOne"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseZero" aria-expanded="true" aria-controls="collapseZero">Motoristas</button></h2>
+          <div id="collapseZero" class="accordion-collapse collapse" aria-labelledby="headingZero" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              <a href="{% url 'singup-driver' %}" type="button" class="btn btn-primary">Create</a>
+              <form action="{% url 'update-driver' %}" class="mt-2" method="get">
+                <label for="driver_up">ID User</label>
+                <input class="form-control" type="text" name="driver_up" value="" />
+                <button type="submit" class="btn btn-success mt-2">Editar</button>
+              </form>
+              <form action="{% url 'delete-user' %}" class="mt-2" method="get">
+                <label for="driver_delete">ID User</label>
+                <input class="form-control" type="text" name="driver_delete" value="" />
+                <button type="submit" class="btn btn-danger mt-2">Deletar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingOne"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Passageiros</button></h2>
+          <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              <a href="{% url 'singup-passenger' %}" type="button" class="btn btn-primary">Create</a>
+              <form action="{% url 'update-passenger' %}" class="mt-2" method="get">
+                <label for="pass_up">ID User</label>
+                <input class="form-control" type="text" name="pass_up" value="" />
+                <button type="submit" class="btn btn-success mt-2">Editar</button>
+              </form>
+              <form action="{% url 'delete-user' %}" class="mt-2" method="get">
+                <label for="driver_delete">ID User</label>
+                <input class="form-control" type="text" name="driver_delete" value="" />
+                <button type="submit" class="btn btn-danger mt-2">Deletar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingTwo"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Veiculos</button></h2>
+          <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              <a href="{% url 'create-vehicle' %}" type="button" class="btn btn-primary">Create</a>
+              <a href="{% url 'list-vehicle' %}" type="button" class="btn btn-secondary">Read</a>
+              <form action="{% url 'delete-vehicle' %}" class="mt-2" method="get">
+                <label for="vehicle_delete">ID Veículo</label>
+                <input class="form-control" type="text" name="vehicle_delete" value="" />
+                <button type="submit" class="btn btn-danger mt-2">Deletar</button>
+              </form>
+              <form action="{% url 'list-vehicle' %}" class="mt-2" method="get">
+                <label for="owner">Dono</label>
+                <input label="Dono" class="form-control" type="text" name="owner" value="" />
+                <button type="submit" class="btn btn-secondary mt-2">Pesquisar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingThree"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">Viagem</button></h2>
+          <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              <a href="{% url 'create-trip' %}" type="button" class="btn btn-primary">Create</a>
+              <a href="{% url 'book-trip' %}" type="button" method="" class="btn btn-warning">Book</a>
+              <a href="" type="button" class="btn btn-success">Update</a>
+              <form action="{% url 'list-passenger-trip' %}" class="mt-2" method="get">
+                <label for="passenger">ID Passageiro</label>
+                <input class="form-control" type="text" name="passenger" value="" />
+                <button type="submit" class="btn btn-secondary mt-2">Pesquisar Viagens Passageiro</button>
+              </form>
+              <form action="{% url 'list-driver-trip' %}" class="mt-2" method="get">
+                <label for="driver">ID Motorista</label>
+                <input class="form-control" type="text" name="driver" value="" />
+                <button type="submit" class="btn btn-secondary mt-2">Pesquisar Viagem Motoristas</button>
+              </form>
+              <form action="{% url 'search-trip' %}" class="mt-2" method="get">
+                <label for="origen">Origem</label>
+                <input label="origen" class="form-control" type="text" name="origen" value="" />
+                <label for="destino">Destino</label>
+                <input label="destino" class="form-control" type="text" name="destination" value="" />
+                <label for="day">Dia</label>
+                <input label="day" type="date" class="form-control" type="text" name="day" value="" />
+                <button type="submit" class="btn btn-secondary mt-2">Pesquisar Viagens</button>
+              </form>
+              <form action="{% url 'delete-trip' %}" class="mt-2" method="get">
+                <label for="trip">ID Viagem</label>
+                <input class="form-control" type="text" name="trip" value="" />
+                <button type="submit" class="btn btn-danger mt-2">Deletar</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

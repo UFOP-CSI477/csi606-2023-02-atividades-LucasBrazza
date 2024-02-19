@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.views.generic import ListView
-from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, GenericAPIView
 from .models import VehicleModel
-from .serializers import VehicleCreateSerializer, VehicleSerializer
-from User.permissions import IsOwnerOrSysManager, IsClientOrDriver, IsDriverOrSysManager, IsNotAuthenticated
+from .serializers import VehicleSerializer, VehicleSerializerDelete, VehicleSerializerID
+from User.permissions import IsOwnerOrSysManager, IsDriverOrSysManager
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -11,27 +11,32 @@ from rest_framework import status
 
 from .models import VehicleModel
 
+from rest_framework.response import Response
+
 class UserVehiclesListView(ListAPIView):
     model = VehicleModel
-    serializer_class = VehicleSerializer
-    permission_classes = [IsDriverOrSysManager]
-    
-    def get_queryset(self):
-        user_id = self.kwargs['user_id']
-        return VehicleModel.objects.filter(users__id=user_id)
+    serializer_class = VehicleSerializerID
+    queryset = VehicleModel.objects.all()
+    # permission_classes = [IsDriverOrSysManager]
 
+    def get(self, request, *args, **kwargs):
+        owner = request.query_params.get('owner', None)
+        if owner is None:
+            queryset = VehicleModel.objects.all()
+        else :
+            queryset = VehicleModel.objects.filter(owner=owner)
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+    
+    
 class VehicleCreateView(CreateAPIView):
     queryset = VehicleModel.objects.all()
-    serializer_class = VehicleCreateSerializer
-    permission_classes = [IsDriverOrSysManager]
+    serializer_class = VehicleSerializer
+    # permission_classes = [IsDriverOrSysManager]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            # Verifica se o usuário tem permissão para criar um veículo
-            if  request.user.type not in ['client', 'driver']:
-                return Response({"error": "Você não tem permissão para criar um veículo."}, status=status.HTTP_403_FORBIDDEN)
-
             # Cria o veículo
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
@@ -41,11 +46,13 @@ class VehicleCreateView(CreateAPIView):
 
 class VehicleDeleteView(DestroyAPIView):
     queryset = VehicleModel.objects.all()
-    serializer_class = VehicleSerializer
-    permission_classes = [IsOwnerOrSysManager]
+    serializer_class = VehicleSerializerDelete
+    # permission_classes = [IsOwnerOrSysManager]
     
     def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        instance = request.query_params.get('vehicle_delete', None)
+        v = VehicleModel.objects.get(pk=instance)
+        self.perform_destroy(v)
+        return Response({"success": "Veículo excluído com sucesso"}, status=status.HTTP_204_NO_CONTENT)
+    
     

@@ -1,44 +1,42 @@
-from django import forms
-from django.forms import ModelForm, ValidationError
-from .models import Trip
-import datetime
+from rest_framework import forms
+from .models import TripModel, PassengerTripModel
+from Vehicles.models import VehicleModel
+from rest_framework.forms import ModelForm
+class PassengerTripModeForm(ModelForm):
+    class Meta:
+        model = PassengerTripModel
+        fields = ['trip', 'passenger']
 
 
 class TripForm(ModelForm):
-    
-    day = forms.DateField(widget=forms.SelectDateWidget)
-    schedule = forms.TimeField(widget=forms.TimeInput)
+    passengers = PassengerTripModeForm(many=True, read_only=True)
     
     class Meta:
-        model = Trip
+        model = TripModel
         fields = [
             'origen',
             'destination',
             'day',
-            'schedule',
-            'driver',
+            'scheduled_time',
             'vehicle',
             'vacancies',
-            'seats_taken'
+            'seats_taken',
+            'price',
         ]
         
-        def __init__(self):
-            pass
+        def create(self, validated_data):
+            if self.context["request"].user.user_type != "driver": 
+                raise forms.ValidationError("Apenas motoristas podem criar viagens.")
+            validated_data["driver"] = self.context["request"].user
+            validated_data["seats_taken"] = VehicleModel.objects.get(id=validated_data["vehicle"]).seats - validated_data["vacancies"]
+            return TripModel.objects.create(**validated_data)
+
+        def get_seats_taken(self, obj):
+            return obj.vehicle.seats_quantity - obj.vacancies
         
-        def clean_day(self):
-            day = self.cleaned_data['day']
-            if day < datetime.date.today():
-                raise ValidationError('Day must be in the future')
-            return day
+
+class PassengerTripForm(ModelForm):
+    class Meta:
+        model = PassengerTripModel
+        fields = ['trip', 'passenger']
         
-        def clean_schedule(self):
-            schedule = self.cleaned_data['schedule']
-            if schedule < datetime.time.now():
-                raise ValidationError('Schedule must be in the future')
-            return schedule
-        
-        def clean_seats_taken(self):
-            seats_taken = self.cleaned_data['seats_taken']
-            if seats_taken < 0:
-                raise ValidationError('Seats taken must be a positive number')
-            return seats_taken

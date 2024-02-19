@@ -16,13 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from User.views import LoginView, LogoutView
+from User.views import LoginView, LogoutView, HomeView
 
 urlpatterns = [
+    path('', HomeView.as_view(), name='homepage'),
     path('admin/', admin.site.urls),
     path('user/', include('User.urls')),
+    path('trip/', include('Trip.urls')),
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
-    # path('vehicles/', include('Vehicles.urls')) # inclua as URLs do aplicativo 'Vehicles'
+    path('vehicles/', include('Vehicles.urls')) # inclua as URLs do aplicativo 'Vehicles'
     # path('trip/', include('Trip.urls')) # inclua as URLs do aplicativo 'Trip'
 ]

@@ -22,7 +22,7 @@ class TripModel(models.Model):
     price = models.DecimalField(max_digits=5, decimal_places=2, blank=False)
     
     def __str__(self):
-        return f'{self.origen} - {self.destination} - {self.day} - {self.scheduled_time} - {self.driver}'
+        return f'{self.origen} - {self.destination} - {self.day} - {self.scheduled_time}'
 
 
 class PassengerTripModel(models.Model):
@@ -33,4 +33,5 @@ class PassengerTripModel(models.Model):
     id = models.AutoField(primary_key=True)
     trip = models.ForeignKey(TripModel, on_delete=models.CASCADE)
     passenger = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    
     

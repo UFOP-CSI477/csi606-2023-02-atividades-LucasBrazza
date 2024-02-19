@@ -64,7 +64,7 @@ INSTALLED_APPS = [
     
     'rest_framework',
     'crispy_forms',
-    "crispy_bootstrap5",
+    # "crispy_bootstrap5",
     "bootstrap5",
     
     'User',
@@ -86,11 +86,10 @@ ROOT_URLCONF = 'server.urls'
 
 TEMPLATES_DIR = ROOT_DIR / 'web' / 'templates'
 
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [  TEMPLATES_DIR ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -163,6 +162,10 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [ ROOT_DIR / 'web' / 'static',]
 
 
 # Static files (CSS, JavaScript, Images)

@@ -1,23 +1,22 @@
 from rest_framework import serializers
-from .models import VehicleModel, VehicleType
+from .models import VehicleModel
 
 class VehicleSerializer(serializers.ModelSerializer):
     class Meta:
         model = VehicleModel
-        fields = ['plate', 'type', 'seats_quantity']
+        fields = ['plate', 'type', 'seats_quantity', 'owner']
 
-
-    def create(self, validated_data):
+class VehicleSerializerDelete(serializers.ModelSerializer):
+    class Meta:
+        model = VehicleModel
+        fields = []
         
-        validated_data['owner'] = self.context['request'].user
 
-        # Definir seats_quantity automaticamente com base no tipo de veículo
-        vehicle_type = validated_data['type']
-        if vehicle_type == VehicleType.CAR.value:
-            validated_data['seats_quantity'] = 4
-        elif vehicle_type == VehicleType.BUS.value:
-            validated_data['seats_quantity'] = 40
-        elif vehicle_type == VehicleType.VAN.value:
-            validated_data['seats_quantity'] = 12
+class VehicleSerializerID(serializers.ModelSerializer):
+    class Meta:
+        model = VehicleModel
+        fields = ['id', 'plate', 'type', 'seats_quantity', 'owner']
 
-        return super().create(validated_data)
+    def get(self, request, *args, **kwargs):
+        
+        return 

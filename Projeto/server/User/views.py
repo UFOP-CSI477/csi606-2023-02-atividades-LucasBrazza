@@ -1,19 +1,18 @@
 from django.contrib.auth import login,  logout, authenticate
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
+
 from django.views.generic import View
-from rest_framework.generics import CreateAPIView, UpdateAPIView, DestroyAPIView, GenericAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, UpdateAPIView, DestroyAPIView, GenericAPIView, RetrieveAPIView,RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import UserModel
-from .authentication import CustomAuthentication
 from .serializers import UserDriverSerializer, UserPassengerSerializer, LoginSerializer
-from User.permissions import IsOwnerOrSysManager, IsPassengerOrDriver, IsDriverOrSysManager, IsNotAuthenticated
-
+from User.permissions import IsOwnerOrSysManager, IsNotAuthenticated
+from django.views import generic
 
 class CreateDriverUserView(CreateAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserDriverSerializer
-    permission_classes = [IsNotAuthenticated]
 
 
     def create(self, request, *args, **kwargs):
@@ -41,9 +40,9 @@ class CreatePassengerUserView(CreateAPIView):
 class UpdateDriverUserView(UpdateAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserDriverSerializer
-    permission_classes = [IsOwnerOrSysManager]
+    # permission_classes = [IsOwnerOrSysManager]
 
-    def update(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data)
         if serializer.is_valid():
@@ -52,13 +51,12 @@ class UpdateDriverUserView(UpdateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UpdatePassengerUserView(RetrieveAPIView):
+class UpdatePassengerUserView(RetrieveUpdateAPIView):
     queryset = UserModel.objects.all()
     serializer_class = UserPassengerSerializer
-    permission_classes = [IsOwnerOrSysManager]
+    # permission_classes = [IsOwnerOrSysManager]
 
-    def update(self, request, *args, **kwargs):
-        print(request.user)
+    def put(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data)
         if serializer.is_valid():
@@ -67,25 +65,26 @@ class UpdatePassengerUserView(RetrieveAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def get(self, request, *args, **kwargs):
-        print(request.user)
         instance = self.get_object()
+        print('instance', instance)
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
     
 class DeleteUserView(DestroyAPIView):
     queryset = UserModel.objects.all()
-    permission_classes = [IsOwnerOrSysManager]
+    serializer_class = UserDriverSerializer
+    # permission_classes = [IsOwnerOrSysManager]
     
     def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        instance = request.query_params.get('trip', None)
+        u = UserModel.objects.filter(pk=instance)
+        self.perform_destroy(u)
+        return Response({"success": "Motorista excluído com sucesso"}, status=status.HTTP_204_NO_CONTENT)
 
 
 class LoginView(GenericAPIView):
     serializer_class = LoginSerializer
-    renderer_classes
-
+    
     def post(self, request, *args, **kwargs):
         serializer = LoginSerializer
         print('serializer', serializer)
@@ -102,9 +101,13 @@ class LoginView(GenericAPIView):
                 return Response({'error': 'Usuário não encontrado'}, status=status.HTTP_404_NOT_FOUND)
             else:
                 return Response({'error': 'Senha incorreta'}, status=status.HTTP_401_UNAUTHORIZED)
-            
-                
+
+              
 class LogoutView(View):
     def get(self, request):
         logout(request)
         return redirect('login')  # Redirecione para a página de login após o logout
+    
+    
+class HomeView(generic.TemplateView):
+    template_name = 'index.html'

@@ -2,20 +2,16 @@ from django.views.generic import ListView, CreateView
 from django.urls import reverse_lazy
 from rest_framework import permissions, serializers, viewsets, status
 from rest_framework.response import Response 
-from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView, GenericAPIView
 from Vehicles.models import VehicleModel
 from .models import TripModel, PassengerTripModel
-from .serializers import PassengerTripSerializer, TripSerializer
+from .serializers import PassengerTripSerializer, TripSerializer, SearchTripSerializer
 from User.permissions import IsDriverOrSysManager, IsPassengerOrDriver, IsNotAuthenticated
 
 class TripCreateView(CreateAPIView):
     queryset = TripModel.objects.all()
     serializer_class = TripSerializer
-    permission_classes = [IsDriverOrSysManager]
 
-    def perform_create(self, serializer):
-        # Set the driver to the current user
-        serializer.save(driver=self.request.user)
 
 
 class ListTripView(ListAPIView):
@@ -23,24 +19,21 @@ class ListTripView(ListAPIView):
     serializer_class = TripSerializer
     
 
-class SearchTripView(ListAPIView):
+class SearchTripView(GenericAPIView):
     queryset = TripModel.objects.all()
-    serializer_class = TripSerializer
-    
-    def get_queryset(self):
-        queryset = TripModel.objects.all()
-        origin = self.request.query_params.get('origin', None)
-        destination = self.request.query_params.get('destination', None)
-        day = self.request.query_params.get('day', None)
-        
-        if origin:
-            queryset = queryset.filter(origin__icontains=origin)
-        if destination:
-            queryset = queryset.filter(destination__icontains=destination)
-        if day:
-            queryset = queryset.filter(day=day)
-        
-        return queryset
+    serializer_class = SearchTripSerializer
+
+    def get(self, request, *args, **kwargs):
+        origen = request.query_params.get('origen', None)
+        destination = request.query_params.get('destination', None)
+        day = request.query_params.get('day', None)
+        queryset = origen + destination + day
+
+        if queryset is not None:
+            queryset = TripModel.objects.filter(day=day, origen__icontains=origen, destination__icontains=destination)
+            print('queryset', queryset)
+            return Response(self.get_serializer(queryset, many=True).data)
+        return Response({"error": "Nenhuma viagem encontrada"}, status=status.HTTP_404_NOT_FOUND)
     
 class FinishedTripView(DestroyAPIView):
     queryset = TripModel.objects.all()
@@ -50,27 +43,44 @@ class FinishedTripView(DestroyAPIView):
     
 
 class PassengerTripListView(ListAPIView):
-    serializer_class = PassengerTripSerializer
+    queryset = TripModel.objects.all()
+    serializer_class = SearchTripSerializer
     
-    def get_queryset(self):        
-        return PassengerTripModel.objects.get(passenger=self.request.user)
+    def get(self, request, *args, **kwargs):
+        passenger = request.query_params.get('passenger', None)
+        print('passenger', passenger)
+        
+        if passenger is not None:
+            queryset = TripModel.objects.filter(passengers__cpf=passenger)
+            print('queryset', queryset)
+            return Response(self.get_serializer(queryset, many=True).data)
+
+        return Response({"error": "Nenhuma viagem encontrada"}, status=status.HTTP_404_NOT_FOUND)
     
 
 class DriverTripListView(ListAPIView):
-    serializer_class = TripSerializer
+    queryset = TripModel.objects.all()
+    serializer_class = SearchTripSerializer
     
-    def get_queryset(self):
-        return TripModel.objects.get(driver=self.request.user)
+    def get(self, request, *args, **kwargs):
+        driver = request.query_params.get('driver', None)
+        print('driver', driver)
+        
+        if driver is not None:
+            queryset = TripModel.objects.filter(driver__cpf=driver)
+            print('queryset', queryset)
+            return Response(self.get_serializer(queryset, many=True).data)
 
-
+        return Response({"error": "Nenhuma viagem encontrada"}, status=status.HTTP_404_NOT_FOUND)
+    
 class BookTripView(CreateAPIView):
     serializer_class = PassengerTripSerializer
-    permission_classes = [IsPassengerOrDriver]
+    # permission_classes = [IsPassengerOrDriver]
     
     def create(self, request, *args, **kwargs):
         # Obtém os dados da solicitação
         trip_id = request.data.get('trip')
-        passenger = request.user
+        passenger = request.data.get('passenger')
         
         # Verifica se a viagem existe
         try:
@@ -83,7 +93,7 @@ class BookTripView(CreateAPIView):
             return Response({"error": "Não há vagas disponíveis para esta viagem"}, status=status.HTTP_400_BAD_REQUEST)
         
         # Verifica se o passageiro já está na viagem
-        if trip.passengers.filter(passenger).exists():
+        if trip.passengers.filter(cpf=passenger).exists():
             return Response({"error": "Você já está nesta viagem"}, status=status.HTTP_400_BAD_REQUEST)
         
         # Cria a relação entre a viagem e o passageiro
@@ -95,3 +105,14 @@ class BookTripView(CreateAPIView):
         
         return Response({"success": "Viagem reservada com sucesso"}, status=status.HTTP_201_CREATED)
    
+
+class DeleteTripView(DestroyAPIView):
+    queryset = TripModel.objects.all()
+    serializer_class = TripSerializer
+    # permission_classes = [IsDriverOrSysManager]
+    
+    def destroy(self, request, *args, **kwargs):
+        query = request.query_params.get('trip', None)
+        instance = TripModel.objects.filter(id=query)
+        self.perform_destroy(instance)
+        return Response({"success": "Viagem excluída com sucesso"}, status=status.HTTP_204_NO_CONTENT)

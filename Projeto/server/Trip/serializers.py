@@ -2,26 +2,30 @@ from rest_framework import serializers
 from .models import TripModel, PassengerTripModel
 from Vehicles.models import VehicleModel
 from rest_framework.serializers import ModelSerializer
-class PassengerTripModeSerializer(ModelSerializer):
+
+
+class PassengerTripSerializer(ModelSerializer):
     class Meta:
         model = PassengerTripModel
-        fields = ['trip', 'passenger']
-
-
+        fields = ['id', 'trip', 'passenger']
+        
 class TripSerializer(ModelSerializer):
-    passengers = PassengerTripModeSerializer(many=True, read_only=True)
+    passengers = PassengerTripSerializer(many=True, read_only=True)
     
     class Meta:
         model = TripModel
         fields = [
+            'id',
             'origen',
             'destination',
             'day',
             'scheduled_time',
+            'driver',
             'vehicle',
             'vacancies',
             'seats_taken',
             'price',
+            'passengers'
         ]
         
         def create(self, validated_data):
@@ -35,8 +39,23 @@ class TripSerializer(ModelSerializer):
             return obj.vehicle.seats_quantity - obj.vacancies
         
 
-class PassengerTripSerializer(ModelSerializer):
+class SearchTripSerializer(ModelSerializer):
     class Meta:
-        model = PassengerTripModel
-        fields = ['trip', 'passenger']
+        model = TripModel
+        fields = [
+            'id',
+            'origen',
+            'destination',
+            'day',
+            'driver',
+            'vehicle',
+            'vacancies',
+            'price',
+            'passengers'
+        ]  
         
+        
+
+
+        
+   
