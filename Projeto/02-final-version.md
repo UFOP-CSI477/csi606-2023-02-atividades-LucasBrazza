@@ -1,6 +1,6 @@
-# **CSI606-2021-02 - Remoto - Trabalho Final - Resultados**
+# **CSI606-2021-02 - Trabalho Final - Resultados**
 
-## *Aluna: Princesa Leia (Luke Skywalker)*
+## *Aluno: Lucas Brazzarola de Lima*
 
 --------------
 
